@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+setuptools = {editable = true, file = "file:///Users/jjjoy/WorkDocs.backup/repo/iam-audit-tool/refactor/IAM-Permissions-Guardrails-Development/codecommit"}
+"aws-cdk.aws-codecommit" = "==1.78.0"
+black = "==20.8b1"
+"aws-cdk.aws-codegurureviewer" = "==1.78.0"
+"aws-cdk.aws-iam" = "==1.78.0"
+git-remote-codecommit = "==1.15.1"
+
+[requires]
+python_version = "3.8"

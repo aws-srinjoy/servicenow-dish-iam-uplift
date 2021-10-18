@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+human-iam-users = {editable = true, file = "file:///Users/jjjoy/Workdocs/src/IAM-Permissions-Guardrails/config-rules/human-iam-users"}
+"aws-cdk.aws-iam" = "==1.95.0"
+"aws-cdk.aws-ssm" = "==1.95.0"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"

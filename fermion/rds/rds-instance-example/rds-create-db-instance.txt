@@ -1,0 +1,19 @@
+aws rds create-db-instance \
+    --allocated-storage 20 --db-instance-class db.r4.large \
+    --db-instance-identifier mydbinstance-abac-2 \
+    --engine mysql \
+    --enable-cloudwatch-logs-exports '["error","general","slowquery"]' \
+    --master-username XXX \
+    --master-user-password X \
+    --db-subnet-group-name rds-instance-example-abac-work-1-rdssubnetgroup3527ac04-riz1zzkso7ls \
+    --tags Key=Project,Value=test
+
+aws rds create-db-instance \
+    --allocated-storage 20 --db-instance-class db.r4.large \
+    --db-instance-identifier mydbinstance \
+    --engine mysql \
+    --enable-cloudwatch-logs-exports '["audit","error","general","slowquery"]' \
+    --master-username XXX \
+    --master-user-password X \
+    --db-subnet-group-name rds-instance-example-abac-work-1-rdssubnetgroup3527ac04-riz1zzkso7ls \
+    --tags Key=Project,Value=test

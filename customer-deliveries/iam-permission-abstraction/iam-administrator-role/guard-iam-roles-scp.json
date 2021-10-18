@@ -1,0 +1,24 @@
+{
+   "Sid": "GuardIAMRoles",
+   "Effect": "Deny",
+   "Action": [
+      "iam:AttachRolePolicy",
+      "iam:CreateRole",
+      "iam:DeleteRole",
+      "iam:DeleteRolePermissionsBoundary",
+      "iam:DeleteRolePolicy",
+      "iam:DetachRolePolicy",
+      "iam:PutRolePermissionsBoundary",
+      "iam:PutRolePolicy",
+      "iam:UpdateRole",
+      "iam:UpdateRoleDescription"
+   ],
+   "Resource": [
+      "arn:aws:iam::*:role/arn:aws:iam::123456789123:role/sandbox/administrators/*"
+   ],
+   "Condition": {
+      "ArnNotLike": {
+         "aws:PrincipalARN": "arn:aws:iam::*:role/[INFRASTRUCTURE_AUTOMATION_ROLE]"
+      }
+   }
+}

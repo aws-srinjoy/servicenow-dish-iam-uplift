@@ -1,0 +1,25 @@
+
+ #https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-aws-revoke-iam-user.html
+ schemaVersion: '0.3'
+ description: Encrypt RDS Instance Automation Document
+ assumeRole: '{{automationAssumeRole}}'
+ parameters:
+   AutomationAssumeRole:
+     description: (Required) The Amazon Resource Name (ARN) of the AWS Identity and Access Management (IAM) role that allows Systems Manager Automation to perform the actions on your behalf.
+     type: String
+   IAMResourceId:
+     description: (Required) The ID of the IAM resource you want to revoke unused credentials from.
+     type: String
+   MaxCredentialUsageAge:
+     description: (Required) The number of days within which the credential must have been used.
+     default: '90'
+     type: String
+ mainSteps:
+   - name: filterHumanUsersAndRemediate
+     action: aws:invokeLambdaFunction
+     timeoutSeconds: 1800
+     onFailure: Abort
+     maxAttempts: 3
+     inputs:
+      FunctionName: test
+      Payload: '{"IAMResourceId": "{{ IAMResourceId }}", "MaxCredentialUsageAge": "{{ MaxCredentialUsageAge }}"}'

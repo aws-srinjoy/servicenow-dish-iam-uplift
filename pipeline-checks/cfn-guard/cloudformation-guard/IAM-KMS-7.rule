@@ -1,0 +1,1 @@
+AWS::IAM::ManagedPolicy PolicyDocument.Statement.*.Action.* NOT_IN [kms:DisableKeyRotation] << IAM-KMS-7 Check that either only authorized principals or no principals can disable key rotation. Disabling key rotation will prevent the CMK from automatic annual rotation.

@@ -1,0 +1,11 @@
+kms:ScheduleKeyDeletion
+iam:ResyncMFADevice
+iam:PassRole
+ec2:RunInstances
+sts:AssumeRole
+lambda:InvokeFunction
+aws-portal:ModifyBilling
+aws-portal:ModifyAccount
+budgets:ModifyBudget
+aws-portal:ModifyPaymentMethods
+ec2:CreateSecurityGroup

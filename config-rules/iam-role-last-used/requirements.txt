@@ -1,0 +1,4 @@
+aws-cdk.aws-config==1.116.0
+aws-cdk.aws-cloudformation==1.116.0
+aws-cdk.cloudformation-include==1.116.0
+boto3==1.18.9

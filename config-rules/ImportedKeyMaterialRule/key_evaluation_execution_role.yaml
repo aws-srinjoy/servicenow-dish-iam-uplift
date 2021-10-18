@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'Create role in member accounts to be used by organization rule in master account.'
+Resources:
+  ExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: key-evaluation-execution-role
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: REMOTE
+            Effect: Allow
+            Principal:
+              AWS: !Ref MasterLambdaFunctionRoleArn
+            Action: 'sts:AssumeRole'
+  ExecutionRolePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties: 
+      Description: Permissions to evaluation imported key policies and report to config services
+      ManagedPolicyName: ImportedKeyMaterialRuleEveluation
+      Path: /
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 
+              - config:PutEvaluations
+              - config:GetComplianceDetailsByConfigRule
+              - kms:ListKeys
+              - kms:DescribeKey
+              - kms:GetKeyPolicy
+              - iam:ListInstanceProfiles
+              - iam:ListAttachedRolePolicies
+            Resource: '*'
+      Roles: 
+        - !Ref ExecutionRole
+Parameters:
+  MasterLambdaFunctionRoleArn:
+    Description: Role Arn of Organization Config Rule Lambda Function in Master account.
+    Type: String
+Metadata:
+  'AWS::CloudFormation::Interface':
+    ParameterGroups:
+      - Label:
+          default: Organization Config Rule Lambda Role Arn in master account
+        Parameters:
+          - MasterLambdaFunctionRoleArn
+    ParameterLabels:
+      MasterLambdaFunctionRoleArn:
+        default: >-
+          REQUIRED: Role Arn of Organization Config Rule Lambda Function in Master account.

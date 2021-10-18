@@ -1,0 +1,11 @@
+version: '3.7'
+services:
+  iam-assessment:
+    build: .
+    environment:
+      - S3_BUCKET=
+      - NOTIFICATION_EMAIL_ADDRESS=
+      - ENABLE_SECURITY_HUB_INTEGRATION=True
+    volumes:
+      - ./assessment:/app
+      - ./guardrails:/guardrails

@@ -1,0 +1,20 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "BlacklistedIAMActions",
+            "Effect": "Deny",
+            "Action": [
+                "iam:CreateGroup",
+                "iam:DeactivateMFADevice",
+                "iam:DeleteAccountPasswordPolicy",
+                "iam:DeleteSAMLProvider",
+                "iam:DeleteSigningCertificate",
+                "iam:DeleteVirtualMFADevice"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}

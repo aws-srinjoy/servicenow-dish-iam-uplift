@@ -1,0 +1,5 @@
+aws_cdk.aws_codecommit==1.95.0
+aws_cdk.aws_codegurureviewer==1.95.0
+aws_cdk.aws_iam==1.95.0
+#black==20.8b1
+git-remote-codecommit==1.15.1

@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Deploy iam execution role for find unused iam roles
+
+Parameters:
+  pAccessLevelKey:
+    Type: String
+    Default: access-level
+    Description: Access level tag key for the iam last used IAM role
+
+  pExecutionRoleAccessLevelValue:
+    Type: String
+    Default: '3'
+    Description: >-
+      Access level tag value for the execution role  role. This is the execution role
+      that the config rule will assume to run the evaluations and update the configuration
+      items. The default corresponds to the builder level of 3 when 4 levels are used.
+
+  pManagementAccountId:
+    Type: String
+    Description: AWS Organizations Management Account ID
+    AllowedPattern: '^[0-9]{12}$'
+    ConstraintDescription: >
+      The Account ID must be a 12 character string.
+    MinLength: 12
+    MaxLength: 12
+
+  pIAMRoleLastUsedName:
+    Type: String
+    Description: Role name used in the add-on for the AWS Config rule to periodically scan for unused IAM roles
+    Default: find-unused-iam-roles
+
+Resources:
+  #This needs to specify the role name so the config rule lambda can assume in each member account.
+  FindLastUsedRolesExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: 'find-last-used-roles-iam-execution-role'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Sub arn:aws:iam::${pManagementAccountId}:role/${pIAMRoleLastUsedName}
+            Action:
+              - sts:AssumeRole
+
+      Path: /
+      ManagedPolicyArns:
+        - !Ref FindLastUsedRolesExecutionPolicy
+      Tags:
+        - Key: !Ref pAccessLevelKey
+          Value: !Ref pExecutionRoleAccessLevelValue
+
+  FindLastUsedRolesExecutionPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy for creating a test database
+      Path: /
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: 'iam:GetAccountAuthorizationDetails'
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - 'config:PutEvaluations' 
+              - 'config:ListDiscoveredResources'
+              - 'config:GetResourceConfigHistory'
+              - 'config:BatchGetResourceConfig'
+              - 'config:GetComplianceDetailsByConfigRule'
+            Resource: '*'
+
+Outputs:
+  FindLastUsedRolesExecutionRoleName:
+    Description: Find last used roles execution role name
+    Value: !Ref FindLastUsedRolesExecutionRole

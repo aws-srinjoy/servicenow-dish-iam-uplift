@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Stackset to alert users if any blacklisted actions have been recorded in CloudTrail. Launch stack in the us-east-1 since all IAM events are recorded in that region
+
+Parameters:
+  BlacklistedActions:
+    Description: Comma-separated API calls which are not allowed in any accounts (Actions which work on Describe/List is not supported)
+    Type: CommaDelimitedList
+    Default: UpdateAssumeRolePolicy,CreateRole,DeleteRole
+  SNSTopic:
+    Description: Create a new SNS Topic if there is no SNS topic already present
+    Default: arn:aws:sns:us-east-1:199026281574:dynamodb
+    Type: String
+  LambdaBasicExecutionPolicyArn:
+    Default: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Type: String
+  LambdaBucket:
+    Default: arn:aws:s3:::cfn-tr-test
+    Type: String
+    Description: ARN of the S3 bucket where the Lambda is sourced from
+
+
+Resources:
+  EventsRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Rule to find the blacklisted actions
+      EventPattern: 
+        # source:
+        #   - "aws.iam"
+        detail-type:
+          - "AWS API Call via CloudTrail"
+        detail:
+          eventSource:
+            - "iam.amazonaws.com"
+          eventName: !Ref BlacklistedActions
+      Name: BlacklistAction
+      State: "ENABLED"
+      Targets: 
+        - 
+          Arn: 
+            Fn::GetAtt:
+              - "LambdaFunction"
+              - "Arn"
+          Id: "1"
+  PermissionForEventsToInvokeLambda: 
+    Type: AWS::Lambda::Permission
+    Properties: 
+      FunctionName: 
+        Ref: "LambdaFunction"
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"    
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code: 
+        S3Bucket: cfn-tr-test
+        S3Key: blacklist.zip
+      Runtime: python3.8
+      Timeout: 10
+      Role: !GetAtt LambdaRole.Arn
+      Handler: blacklist.main
+      Environment:
+        Variables:
+          sns_topic: !Ref SNSTopic
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      ManagedPolicyArns:
+        - !Ref LambdaBasicExecutionPolicyArn
+      Policies:
+        - PolicyName: SNSPublish
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - sns:Publish
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource: 
+                  - !Ref SNSTopic
+                  - !Ref LambdaBucket
+      RoleName: LambdaRoleDetection

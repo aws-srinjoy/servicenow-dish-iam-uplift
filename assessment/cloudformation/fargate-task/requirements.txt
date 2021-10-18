@@ -1,0 +1,8 @@
+aws_cdk.aws_iam==1.95.0
+aws_cdk.aws_ecs==1.95.0 
+aws_cdk.aws_ecs_patterns==1.95.0 
+aws_cdk.aws_events==1.95.0
+aws_cdk.aws_applicationautoscaling==1.95.0
+aws_cdk.aws_ecr==1.95.0
+aws_cdk.aws-events-targets==1.95.0
+aws_cdk.aws_s3==1.95.0

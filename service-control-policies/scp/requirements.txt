@@ -1,0 +1,9 @@
+gitpython==3.1.11
+aws-cdk.pipelines==1.82.0
+aws-cdk.aws_codepipeline_actions==1.82.0
+aws-cdk.aws_codepipeline==1.82.0
+aws-cdk.aws-codebuild==1.82.0
+aws-cdk.custom-resources==1.82.0
+aws-cdk.aws-events-targets==1.82.0
+aws-cdk.aws-events==1.82.0
+git+https://github.com/aws-samples/aws-iam-permissions-guardrails@75bb5b1efcc395eb6f9b474a62a9a1f69c4e0e86#egg=iam-permissions-guardrails

@@ -1,0 +1,24 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+access-analyzer-example = {editable = true,file = "file:///Users/jjjoy/WorkDocs/repo/IAM-Permissions-Guardrails/access-analyzer/access-analyzer-example/access-analyzer-example"}
+"aws-cdk.aws-s3" = "==1.33.0"
+"aws-cdk.aws-accessanalyzer" = "==1.33.0"
+"aws-cdk.aws-kms" = "==1.33.0"
+"aws-cdk.aws-iam" = "==1.33.0"
+"aws-cdk.aws-lambda" = "==1.33.0"
+"aws-cdk.aws-events" = "==1.33.0"
+"aws-cdk.aws-events-targets" = "==1.33.0"
+"aws-cdk.aws-sqs" = "==1.33.0"
+"aws-cdk.aws-sns" = "==1.33.0"
+"aws-cdk.aws-sns-subscriptions" = "==1.33.0"
+"aws-cdk.aws-stepfunctions" = "==1.33.0"
+"aws-cdk.aws-stepfunctions-tasks" = "==1.33.0"
+
+[requires]
+python_version = "3.8"

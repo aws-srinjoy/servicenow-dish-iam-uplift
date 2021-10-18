@@ -1,0 +1,18 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Deny",
+        "Action": [
+          "rds:CreateDBInstance"        ],
+        "Resource": [
+          "arn:aws:rds:*:*:db:*"
+        ],
+        "Condition": {
+          "StringNotLike": {
+            "aws:RequestTag/Project": "test"
+          }
+        }
+      }
+    ]
+  }

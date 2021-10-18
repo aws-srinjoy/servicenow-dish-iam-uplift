@@ -1,0 +1,12 @@
+{
+  "app": "python3 app.py",
+  "context": {
+    "branch":"mainline",
+    "test-account-number":"416368782481",
+    "@aws-cdk/core:newStyleStackSynthesis": true,
+    "@aws-cdk/core:enableStackNameDuplicates": "true",
+    "aws-cdk:enableDiffNoFail": "true",
+    "@aws-cdk/core:stackRelativeExports": "true",
+    "@aws-cdk/aws-ecr-assets:dockerIgnoreSupport": true
+  }
+}

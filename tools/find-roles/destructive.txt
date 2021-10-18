@@ -1,0 +1,6 @@
+Deactivate
+Delete
+Detach
+Disable
+Remove
+Revoke

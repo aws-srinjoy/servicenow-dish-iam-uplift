@@ -1,0 +1,12 @@
+*.swp
+package-lock.json
+__pycache__
+.pytest_cache
+.env
+*.egg-info
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+
+access-analyzer-example/access-analyzer-example/access-analyzer-finding.json

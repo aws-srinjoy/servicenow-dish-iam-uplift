@@ -1,0 +1,61 @@
+As of v0.12 of Terraform - the Terraform plan can be output to JSON Format by executing the following commands:
+terraform plan -out terraformplan
+terraform show -json terraformplan > terraformplan.json
+(schema is documented at https://www.terraform.io/docs/internals/json-format.html#plan-representation) 
+
+**Also of note - Hashicorp Sentinel for TFE Customers (https://www.hashicorp.com/sentinel/), and Open Policy Agent (https://www.openpolicyagent.org/docs/latest/terraform/) - we just parse the JSON directly in this Lambda.**
+
+This enables programmatic parsing of Terraform Plans for changes - typically as a build stage within a pipeline. 
+
+The customer wanted to have a pipeline check to assess that IAM Role Trust Policies created by developers didn't violate company security standards. With this check - the customer wanted to enforce two rules:
+
+Cross Account Roles can only be created between white-listed Accounts owned by the customer.
+Cross Account Roles aren't created between environment levels (eg - Dev, Lab, Test, Prod)
+
+This artifact includes the python code for a lambda to be invoked by a Pipeline to enforce the rules above (in this case - Gitlab CI/CD - can easily be modified to consume the terraform plan as a codepipeline build stage that would submit the terraform plan json as a build artifact). The Lambda maintains a whitelist of allowed accounts, and if you choose to utilize it - their associated environment level. Example below:
+
+AllowedAccounts = {
+"111111111111":"Lab",
+"22222222222":"Lab,
+"33333333333":"Dev",
+"44444444444":"Dev,
+"55555555555":"Prod",
+"66666666666":"Prod"
+}
+
+in addition - is a list of approved service principals:
+
+AllowedServices = {
+    "lambda.amazonaws.com",
+    "ec2.amazonaws.com"
+}    
+
+
+The Lambda expects a payload of the following:
+
+{"TargetAccountId" : "111111111111",
+"TerraformPlan: "{format_version":"0.1","terraform_version":"0.12.6",.......}}"
+
+With the TargetAccountId being the Account ID we are deploying the Terraform Template to, and the TerraformPlan containing the output of the "terraform show -json terraformplanfile" command
+
+When the Lambda is invoked with the payload - it will parse the Terraform Plan - searching for create or update actions of IAM Roles - and parse the associated trust policy with each role to grab the specified Principals in each. From there - it will compare all found principals to the whitelist of accounts and services, and evaluate if the account ID or Service Principal of each is within its respective whitelist. If it so - that particular principal will be marked as COMPLIANT. If not - it will be marked as NONCOMPLIANT. In addition - if the CrossEnvironmentCheckEnabled option is set to True - the lambda will check if the environment associated with the TargetAccountId matches the environment associated with the account ID for the principal - it will be marked COMPLIANT. If not - it will return NONCOMPLIANT. If any role contains at least one Non-Compliant Principal, the overall result will be NONCOMPLIANT. All principals in the trust policy must be in the whitelist for the overall result to be compliant
+
+The Lambda will return a payload of the following structure:
+{"Result" : "Compliant\Non-Compliant\Error",
+"Comment" : "CommentHere",
+"ComplianceReport": [
+                    {
+            "RoleName": MyNonCompliantRole,
+            "Principals": [
+                               {"Principal":"123459601021",
+                                "Compliance":"True",
+                               "CrossEnvironment" : "False"},
+                               {"Principal":"ssm.amazonaws.com"
+                                "Compliance":"False",
+                                 "CrossEnvironment": None}
+         ]
+        }
+           ]
+
+
+Utilizes a slightly modified version of Netflix's PolicyUniverse module for parsing the policy documents, included in the zip (https://github.com/Netflix-Skunkworks/policyuniverse)

@@ -1,0 +1,6 @@
+AWS::KMS::Key KeyPolicy.Statement.*.Action.* NOT_IN [kms:ConnectCustomKeyStore,kms:CreateCustomKeyStore]
+AWS::KMS::Key KeyPolicy.Statement.*.Action.* != kms:ScheduleKeyDeletion
+AWS::KMS::Key KeyPolicy.Statement.*.Action.* NOT_IN [kms:ScheduleKeyDeletion]
+AWS::IAM::Role AssumeRolePolicyDocument.Statement.*.Principal.Service.* IN [lambda.amazonaws.com]
+
+AWS::IAM::ManagedPolicy PolicyDocument.Statement.*.Action.* NOT_IN [ec2:DeleteVpc]

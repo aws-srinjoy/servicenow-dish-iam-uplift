@@ -1,0 +1,41 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:Describe*",
+                "ec2:GetConsole*",
+                "cloudwatch:DescribeAlarms",
+                "iam:ListInstanceProfiles",
+                "cloudwatch:GetMetricStatistics",
+                "kms:ReEncryptFrom"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": "ec2:RunInstances",
+            "Resource": [
+                "arn:aws:ec2:us-east-1:<acct id>:instance/*",
+                "arn:aws:ec2:us-east-1: <acct id>:network-interface/*",
+                "arn:aws:ec2:us-east-1: <acct id>:key-pair/*",
+                "arn:aws:ec2:us-east-1: <acct id>:volume/*",
+                "arn:aws:ec2:us-east-1: <acct id>:subnet/*",
+                "arn:aws:ec2:us-east-1: <acct id>security-group/*"
+            ]
+        },
+        {
+            "Sid": "VisualEditor2",
+            "Effect": "Allow",
+            "Action": "ec2:RunInstances",
+            "Resource": [
+                "arn:aws:ec2:us-east-1::image/ami-04c44e95de9d6513d",
+                "arn:aws:ec2:us-east-1::image/ami-0cb87a94ae96bcc31",
+                "arn:aws:ec2:us-east-1::image/ami-0d360a2ee4e554aa1"
+            ]
+        }
+    ]
+}

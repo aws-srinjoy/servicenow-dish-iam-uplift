@@ -1,0 +1,183 @@
+Parameters:
+  MaxSessionDuration:
+    Type: String
+    Default: 1
+    Description: Maximum Session Duration for Assume Role - Hours
+  IAMPath:
+    Type: String
+    Default: /
+    Description: IAM Path
+  IdentityProviderName:
+    Type: String
+    Description: Identity Provider SAML Name
+Resources:
+  TransitGatewayAdminD521516C:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - ec2:AcceptTransitGatewayVpcAttachment
+              - ec2:AssociateTransitGatewayRouteTable
+              - ec2:CreateTransitGateway
+              - ec2:CreateTransitGatewayRoute
+              - ec2:CreateTransitGatewayRouteTable
+              - ec2:CreateTransitGatewayVpcAttachment
+              - ec2:DeleteTransitGateway
+              - ec2:DeleteTransitGatewayRoute
+              - ec2:DeleteTransitGatewayRouteTable
+              - ec2:DeleteTransitGatewayVpcAttachment
+              - ec2:DescribeTransitGatewayAttachments
+              - ec2:DescribeTransitGatewayRouteTables
+              - ec2:DescribeTransitGatewayVpcAttachments
+              - ec2:DescribeTransitGateways
+              - ec2:DisableTransitGatewayRouteTablePropagation
+              - ec2:DisassociateTransitGatewayRouteTable
+              - ec2:EnableTransitGatewayRouteTablePropagation
+              - ec2:ExportTransitGatewayRoutes
+              - ec2:GetTransitGatewayAttachmentPropagations
+              - ec2:GetTransitGatewayRouteTableAssociations
+              - ec2:GetTransitGatewayRouteTablePropagations
+              - ec2:ModifyTransitGatewayVpcAttachment
+              - ec2:RejectTransitGatewayVpcAttachment
+              - ec2:ReplaceTransitGatewayRoute
+              - ec2:SearchTransitGatewayRoutes
+            Effect: Allow
+            Resource: "*"
+            Sid: TransitGatewayAdministrator
+          - Action:
+              - networkmanager:UpdateDevice
+              - networkmanager:DisassociateLink
+              - networkmanager:UpdateSite
+              - networkmanager:UpdateGlobalNetwork
+              - networkmanager:GetCustomerGatewayAssociations
+              - networkmanager:DeleteSite
+              - networkmanager:DeregisterTransitGateway
+              - networkmanager:GetLinks
+              - networkmanager:GetSites
+              - networkmanager:GetLinkAssociations
+              - networkmanager:AssociateLink
+              - networkmanager:ListTagsForResource
+              - networkmanager:DisassociateCustomerGateway
+              - networkmanager:AssociateCustomerGateway
+              - networkmanager:CreateGlobalNetwork
+              - networkmanager:CreateDevice
+              - networkmanager:DeleteDevice
+              - networkmanager:RegisterTransitGateway
+              - networkmanager:DeleteGlobalNetwork
+              - networkmanager:GetTransitGatewayRegistrations
+              - networkmanager:CreateSite
+              - networkmanager:UntagResource
+              - networkmanager:UpdateLink
+              - networkmanager:CreateLink
+              - networkmanager:GetDevices
+              - networkmanager:DeleteLink
+              - networkmanager:TagResource
+              - networkmanager:DescribeGlobalNetworks
+            Effect: Allow
+            Resource: "*"
+            Sid: TransitGatewayNetworkManagerAdministrator
+        Version: "2012-10-17"
+      Description: Transit Gateway Administrator
+      Path:
+        Ref: IAMPath
+    Metadata:
+      aws:cdk:path: network-admin-role-example/TransitGatewayAdmin/Resource
+  NetworkAdministratorB3EBFABD:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRoleWithSAML
+            Condition:
+              StringEquals:
+                SAML:aud: https://signin.aws.amazon.com/saml
+            Effect: Allow
+            Principal:
+              Federated:
+                Fn::Join:
+                  - ""
+                  - - "arn:aws:iam::"
+                    - Ref: AWS::AccountId
+                    - :saml-provider/
+                    - Ref: IdentityProviderName
+        Version: "2012-10-17"
+      Description: Network Administrator
+      ManagedPolicyArns:
+        - Ref: TransitGatewayAdminD521516C
+      MaxSessionDuration: 3600
+      Path:
+        Ref: IAMPath
+    Metadata:
+      aws:cdk:path: network-admin-role-example/NetworkAdministrator/Resource
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Modules: aws-cdk=1.33.1,@aws-cdk/aws-iam=1.33.1,@aws-cdk/cloud-assembly-schema=1.33.1,@aws-cdk/core=1.33.1,@aws-cdk/cx-api=1.33.1,@aws-cdk/region-info=1.33.1,jsii-runtime=Python/3.8.1
+    Condition: CDKMetadataAvailable
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-2
+

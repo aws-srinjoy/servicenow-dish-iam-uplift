@@ -1,0 +1,1 @@
+AWS::IAM::ManagedPolicy PolicyDocument.Statement.*.Action.* NOT_IN [s3:CreateAccessPoint] << IAM-S3-AP-1 Check that the VPC mentioned in the S3-AccessEndpoint is valid VPC The Access Point cannot be edited once it has been created. If it has been created incorrectly, the only method is to delete the access point and create a new access point.

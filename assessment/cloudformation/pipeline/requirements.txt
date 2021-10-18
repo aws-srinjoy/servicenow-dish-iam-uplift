@@ -1,0 +1,4 @@
+aws-cdk.aws-codebuild==1.95.0
+aws-cdk.aws_codepipeline==1.95.0
+aws-cdk.aws_codepipeline_actions==1.95.0
+aws-cdk.aws_ecr==1.95.0

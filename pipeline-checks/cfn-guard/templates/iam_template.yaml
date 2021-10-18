@@ -1,0 +1,103 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS KMS CMKs
+Parameters:
+  KeyAdministratorRole:
+    Type: String
+    Description: This is the IAM Role that is managing the CMK. Be sure that the key policy that you create allows the current user to administer the CMK. https://aws.amazon.com/premiumsupport/knowledge-center/update-key-policy-future/
+    Default: KeyAdministratorRole
+
+Resources:
+  EMRS3EncryptionAtRestCMK:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: EMR S3 Encryption at rest
+      Enabled: true
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: '2012-10-17'
+        #The kms:ViaService condition key limits use of an AWS KMS customer master key (CMK) to requests from specified AWS services.
+        #https://docs.aws.amazon.com/kms/latest/developerguide/policy-conditions.html#conditions-kms-via-service
+        Statement:
+          #Be sure that the key policy that you create allows the current user to administer the CMK.
+          #https://aws.amazon.com/premiumsupport/knowledge-center/update-key-policy-future/
+          #Error Message will be - The new key policy will not allow you to update the key policy in the future.
+        - Sid: 'Allow administration of the key'
+          Effect: 'Allow'
+          Principal:
+            AWS:
+              - !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+              - !Sub 'arn:aws:iam::${AWS::AccountId}:role/${KeyAdministratorRole}'
+          Action:
+          - 'kms:ConnectCustomKeyStore'
+          - 'kms:CreateCustomKeyStore'
+          - 'kms:Create*'
+          - 'kms:Describe*'
+          - 'kms:Enable*'
+          - 'kms:List*'
+          - 'kms:Put*'
+          - 'kms:Update*'
+          - 'kms:Revoke*'
+          - 'kms:Disable*'
+          - 'kms:Get*'
+          - 'kms:Delete*'
+          - 'kms:ScheduleKeyDeletion'
+          - 'kms:CancelKeyDeletion'
+          - 'kms:TagResource'
+          - 'kms:UntagResource'
+          Resource: '*'
+        - Sid: 'Allow access through EMR Roles'
+          Effect: 'Allow'
+          Principal:
+            AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/JobFlowRoleForEMR'
+          Action:
+            - 'kms:Encrypt'
+            - 'kms:Decrypt'
+            - 'kms:ReEncrypt*'
+            - 'kms:GenerateDataKey*'
+            - 'kms:CreateGrant'
+            - 'kms:ListGrants'
+            - 'kms:DescribeKey'
+          Resource: '*'
+        - Sid: 'Allow attachment of persistent resources'
+          Effect: 'Allow'
+          Principal:
+            AWS:
+              - !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+              - !Sub 'arn:aws:iam::${AWS::AccountId}:role/JobFlowRoleForEMR'
+          Action:
+            - 'kms:CreateGrant'
+            - 'kms:ListGrants'
+            - 'kms:RevokeGrant'
+          Resource: '*'
+
+
+  LambdaRoleHelper:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - 'josh.amazonaws.com'
+                - 'lambda.amazonaws.com'
+                - 'ec2.amazonaws.com'
+
+  NetworkAdministrator:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: NetworkAdministrator
+      Description: A policy to allow network administration
+      Path: /foundational-role/network-administrator/
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - autoscaling:Describe*
+              - ec2:AcceptVpcEndpointConnections
+              - ec2:AllocateAddress
+              - ec2:DeleteVpc
+              - iam:PutRolePolicy
+              - iam:UpdateAssumeRolePolicy
+            Resource: "*"

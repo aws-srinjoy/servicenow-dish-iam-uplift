@@ -1,0 +1,1 @@
+AWS::IAM::ManagedPolicy PolicyDocument.Statement.*.Action.* NOT_IN [ec2:RunInstances] << IAM-EC2-2 Check EC2 instances can only run instances with approved Amazon Machine Images (AMIs). For security hardening, vulnerability management, and configuration management purposes, only approved AMIs should be used to launch instances in Production or Production-like environments.

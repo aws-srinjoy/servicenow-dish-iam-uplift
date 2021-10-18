@@ -1,0 +1,1 @@
+AWS::IAM::ManagedPolicy PolicyDocument.Statement.*.Action.* NOT_IN [ecr:GetAuthorizationToken] << IAM-ECR-2 Check that only authorized principals are able to pull images from ECR. An authorization token is used to manage authorization to ECR. Only authorized principals should have the ability to retrieve the authorization token, in order to protect any images in ECR.

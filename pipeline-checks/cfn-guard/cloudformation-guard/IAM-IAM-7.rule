@@ -1,0 +1,1 @@
+AWS::IAM::ManagedPolicy PolicyDocument.Statement.*.Action.* NOT_IN [iam:GetAccountAuthorizationDetails] << IAM-IAM-7 iam:GetAccountAuthorizationDetails is limited to only whitelisted roles Since this action provides all information (IAM principals and their relationship with each other) about your IAM constrcuts in an account it can be used for recon for unintended actions

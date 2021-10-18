@@ -1,0 +1,4 @@
+boto3==1.18.9
+rdklib==0.2.0
+aws-lambda-powertools==1.18.1
+pysnow==0.7.17

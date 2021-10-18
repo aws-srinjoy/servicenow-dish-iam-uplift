@@ -1,0 +1,75 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "iam:GetRole",
+                "iam:GetPolicyVersion",
+                "iam:DeleteAccessKey",
+                "iam:ListRoleTags",
+                "iam:UpdateUser",
+                "iam:GetAccessKeyLastUsed",
+                "iam:CreateRole",
+                "iam:AttachRolePolicy",
+                "iam:ListUserPolicies",
+                "iam:CreateUser",
+                "iam:CreateAccessKey",
+                "iam:CreatePolicy",
+                "iam:GetUserPolicy",
+                "iam:ListAttachedRolePolicies",
+                "iam:ListAttachedUserPolicies",
+                "iam:GetUser",
+                "iam:CreatePolicyVersion",
+                "iam:ListRolePolicies",
+                "iam:GetRolePolicy",
+                "iam:GetSAMLProvider",
+                "iam:ListUserTags",
+                "iam:ListAccessKeys"
+            ],
+            "Resource": [
+                "arn:aws:iam::*:saml-provider/*",
+                "arn:aws:iam::*:policy/*",
+                "arn:aws:iam::*:user/*",
+                "arn:aws:iam::*:role/*"
+            ]
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "iam:ListPolicies",
+                "iam:ListSAMLProviders",
+                "iam:ListOpenIDConnectProviders",
+                "iam:GetServiceLastAccessedDetailsWithEntities",
+                "iam:ListRoles",
+                "iam:ListUsers",
+                "iam:GetServiceLastAccessedDetails"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "VisualEditor2",
+            "Effect": "Allow",
+            "Action": [
+                "iam:UpdateAssumeRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:DeleteRolePolicy",
+                "iam:PutRolePermissionsBoundary",
+                "iam:AttachRolePolicy",
+                "iam:PutRolePolicy"
+            ],
+            "Resource": "arn:aws:iam::631630108263:role/iam-admininistrator-role"
+        },
+        {
+            "Sid": "VisualEditor4",
+            "Effect": "Deny",
+            "Action": [
+                "iam:DeletePolicy",
+                "iam:SetDefaultPolicyVersion"
+            ],
+            "Resource": "arn:aws:iam::631630108263:policy/iam-admin-policy"
+        }
+    ]
+}

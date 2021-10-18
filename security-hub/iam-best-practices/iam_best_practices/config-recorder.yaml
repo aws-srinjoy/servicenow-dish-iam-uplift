@@ -1,0 +1,127 @@
+#https://github.com/paulieborg/compliance/blob/b5b706af9cfd9133c27b9933ca729ec70ad7d5f7/cf-config-rules.yml
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Sets up the AWS Config service for logging and rule enforcement
+
+
+
+####
+#### Template input parameters
+####
+Parameters:
+  DeliveryFrequency:
+    Type: String
+    Default: Six_Hours
+    Description: Log delivery will take place on the schedule determined here
+    AllowedValues:
+      - One_Hour
+      - Three_Hours
+      - Six_Hours
+      - Twelve_Hours
+      - TwentyFour_Hours
+
+
+Resources:
+
+  LogBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      VersioningConfiguration:
+        Status: Enabled
+
+  # Bucket policy allows the AWS Config service to write to the S3 bucket
+  LoggingBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DeletionPolicy: Retain
+    Properties:
+      Bucket: !Ref LogBucket
+      PolicyDocument:
+        Id: configPolicy
+        Version: '2012-10-17'
+        Statement:
+          - Sid: bucketPermissionsCheck
+            Effect: Allow
+            Action:
+              - s3:getBucketAcl
+            Principal:
+              Service: config.amazonaws.com
+            Resource: !Sub "arn:aws:s3:::${LogBucket}"
+          - Sid: allowLogDelivery
+            Effect: Allow
+            Principal:
+              Service: config.amazonaws.com
+            Action:
+              - s3:PutObject
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: bucket-owner-full-control
+            Resource: !Sub 'arn:aws:s3:::${LogBucket}/AWSLogs/${AWS::AccountId}/Config/*'
+
+  # IAM Role for the AWS Config service
+  IamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          Sid: '1'
+          Effect: Allow
+          Principal:
+            Service: config.amazonaws.com
+          Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSConfigRole
+
+  # IAM Policy for the role
+  IamPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      Roles:
+        - !Ref 'IamRole'
+      PolicyName: awsConfigPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:PutObject
+            Resource: !Sub "arn:aws:s3:::${LogBucket}/*"
+            Condition:
+              StringLike:
+                s3:x-amz-acl: bucket-owner-full-control
+          - Effect: Allow
+            Action:
+              - s3:GetBucketAcl
+            Resource: !Sub "arn:aws:s3:::${LogBucket}"
+
+  ####
+  #### AWS Config service setup
+  ####
+
+  # Delivery channel for AWS Config
+  DeliveryChannel:
+    Type: AWS::Config::DeliveryChannel
+    DependsOn: IamRole
+    Properties:
+      S3BucketName: !Ref LogBucket
+      ConfigSnapshotDeliveryProperties:
+        DeliveryFrequency: !Ref DeliveryFrequency
+
+  # Configuration Recorder for AWS Config
+  ConfigurationRecorder:
+    Type: AWS::Config::ConfigurationRecorder
+    Properties:
+      RoleARN: !GetAtt IamRole.Arn
+      RecordingGroup:
+        AllSupported: true
+        IncludeGlobalResourceTypes: true
+
+####
+#### Output the most useful resources
+####
+Outputs:
+
+  AwsConfigBucket:
+    Description: AWS Config logging bucket
+    Value: !Ref LogBucket
+

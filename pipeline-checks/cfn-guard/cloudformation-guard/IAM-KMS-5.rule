@@ -1,0 +1,1 @@
+AWS::IAM::ManagedPolicy PolicyDocument.Statement.*.Action.* NOT_IN [kms:PutKeyPolicy] << IAM-KMS-5 Check that either only authorized principals or no principals can place a new KMS key policy. Users with the PutKeyPolicy permission for a CMK can completely replace the key policy for a CMK with a different key policy of their choice.

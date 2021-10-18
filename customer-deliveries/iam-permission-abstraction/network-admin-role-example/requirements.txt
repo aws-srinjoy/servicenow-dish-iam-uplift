@@ -1,0 +1,2 @@
+-e .
+aws_cdk.aws_iam==1.33.1

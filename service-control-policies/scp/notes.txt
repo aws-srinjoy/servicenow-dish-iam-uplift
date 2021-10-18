@@ -1,0 +1,8 @@
+pip install git+ssh://git.amazon.com/pkg/IAM-Permissions-Guardrails@72b00f25e749a9b65ea3352cdb84daec5bbf2a38
+
+pip freeze
+python3 -m venv .venv
+
+for the commands
+. .venv/bin/activate
+

@@ -1,0 +1,12 @@
+{
+  "Version": "1.0",
+  "Parameters": {
+    "RuleName": "IMPORTED_KEY_MATERIAL_NOT_DELETE_PERMISSION",
+    "SourceRuntime": "python3.7",
+    "CodeKey": "IMPORTED_KEY_MATERIAL_NOT_DELETE_PERMISSION.zip",
+    "InputParameters": "{\"WhitelistedPrincipalArns\": \"\"}",
+    "OptionalParameters": "{}",
+    "SourceEvents": "AWS::KMS::Key"
+  },
+  "Tags": "[]"
+}

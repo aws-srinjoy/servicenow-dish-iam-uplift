@@ -1,0 +1,1 @@
+AWS::IAM::ManagedPolicy PolicyDocument.Statement.*.Action.* NOT_IN [s3:GetObject] << IAM-S3-AP-6 Limit access to S3 bucket objects by restricting principals which have a common tag as the object Buckets which have S3 access points enabled should have S3 access point policy enabled which allows IAM principals to make call to the objects which are tagged with a particular value

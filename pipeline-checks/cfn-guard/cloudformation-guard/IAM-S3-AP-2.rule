@@ -1,0 +1,1 @@
+AWS::IAM::ManagedPolicy PolicyDocument.Statement.*.Action.* NOT_IN [s3:CreateAccessPoint] << IAM-S3-AP-2 Block Public access to buckets and objects through access points The block public access setting of the Access point should not be open to public unless really justified by customer requirements.

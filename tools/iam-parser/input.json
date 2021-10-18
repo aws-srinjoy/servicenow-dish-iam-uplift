@@ -1,0 +1,89 @@
+{
+  "Roles": [
+    {
+      "RoleName": "string",
+      "RolePath": "string",
+      "TrustPolicy": {},
+      "Policies": [
+        {
+          "Name": "ec2-deny-tags",
+          "Policy": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Deny",
+                "Action": [
+                  "ec2:CreateTags",
+                  "ec2:DeleteTags"
+                ],
+                "Resource": "arn:aws:ec2:*::image/*",
+                "Condition": {
+                  "StringNotEquals": {
+                    "ec2:Owner": [
+                      "362553066481"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "Name": "test2",
+          "Policy": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Deny",
+                "Action": [
+                  "ec2:CreateTags",
+                  "ec2:DeleteTags",
+                  "josh:test",
+                  "ec2:josh"
+                ],
+                "Resource": "arn:aws:ec2:*::image/*",
+                "Condition": {
+                  "StringNotEquals": {
+                    "ec2:Owner": [
+                      "362553066481"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "Name": "test",
+          "Policy": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": "ec2:AcceptVpcPeeringConnection",
+                "Resource": [
+                  "arn:aws:ec2:us-east-1:111122223333:vpc-peering-connection/*",
+                  "arn:aws:ec2:us-east-1:111122223333:vpc/*"
+                ],
+                "Condition": {
+                  "ArnEquals": {
+                    "ec2:RequesterVpc": "arn:aws:ec2:us-east-1:444455556666:vpc/*"
+                  },
+                  "StringEquals": {
+                    "ec2:ResourceTag/Purpose": "Peering"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "Resources": [
+    {
+      "ResourceName": "string",
+      "Policy": {}
+    }
+  ]
+}

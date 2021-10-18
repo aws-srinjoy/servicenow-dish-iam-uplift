@@ -1,0 +1,4 @@
+boto3==1.17.36
+colorama==0.4.4
+parliament==1.4.0
+future_fstrings==1.2.0

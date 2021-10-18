@@ -1,0 +1,63 @@
+version: 0.2
+  
+# This buildspec is intended to be run by CodePipeline builds.
+# https://github.com/aws/aws-cdk/blob/master/buildspec.yaml
+#https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html#build-spec-ref-syntax
+#https://docs.aws.amazon.com/codebuild/latest/userguide/test-report-pytest.html
+#https://aws.amazon.com/blogs/devops/test-reports-with-aws-codebuild/
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      - pwd
+      - echo ${CODEBUILD_SRC_DIR}
+      - echo ${TESTS_DIR}
+      - ls -al
+      - ls -al ./service-control-policies/scp
+      - cd ./service-control-policies/scp/scp/integration_tests/tests
+      - aws sts get-caller-identity
+      - python3 get-scp.py --scp_name ${SCP_NAME}
+      - ORIGINAL_AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+      - ORIGINAL_AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+      - ORIGINAL_AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
+      - pip install --upgrade pip
+      - pip install -r requirements.txt
+      - aws --version
+      - target_role_arn="arn:aws:iam::${TEST_ACCOUNT_NUMBER}:role/${SCP_INTEGRATION_TESTS_ROLE_NAME}"
+      - temp_role=$(aws sts assume-role --role-arn ${target_role_arn} --role-session-name ScpIntegrationTestsRole)
+      - export AWS_ACCESS_KEY_ID=$(echo $temp_role | jq -r .Credentials.AccessKeyId)
+      - export AWS_SECRET_ACCESS_KEY=$(echo $temp_role | jq -r .Credentials.SecretAccessKey)
+      - export AWS_SESSION_TOKEN=$(echo $temp_role | jq -r .Credentials.SessionToken)
+      - aws sts get-caller-identity
+  build:
+    commands:
+      - python3 -m pytest test.py --junitxml=./test-reports/test-report.xml
+      - python3 -m unittest test.WhenRoleHasLevelZeroPermission
+      - python3 -m unittest test.WhenRoleHasLevelOnePermission
+      - python3 -m unittest test.WhenRoleHasLevelTwoPermission
+      - python3 -m unittest test
+      - python3 -m pytest test.py --junitxml=./test-reports/test-report.xml
+    finally:
+      - export AWS_ACCESS_KEY_ID=$ORIGINAL_AWS_ACCESS_KEY_ID
+      - export AWS_SECRET_ACCESS_KEY=$ORIGINAL_AWS_SECRET_ACCESS_KEY
+      - export AWS_SESSION_TOKEN=$ORIGINAL_AWS_SESSION_TOKEN
+      - aws sts get-caller-identity
+      - aws cloudformation delete-stack --stack-name ${SCP_STACK_NAME}
+      - aws cloudformation wait stack-delete-complete --stack-name ${SCP_STACK_NAME}
+      - target_role_arn="arn:aws:iam::${TEST_ACCOUNT_NUMBER}:role/cdk-hnb659fds-deploy-role-${TEST_ACCOUNT_NUMBER}-us-east-1"
+      - temp_role=$(aws sts assume-role --role-arn ${target_role_arn} --role-session-name CDKDeploymentActionRole)
+      - export AWS_ACCESS_KEY_ID=$(echo $temp_role | jq -r .Credentials.AccessKeyId)
+      - export AWS_SECRET_ACCESS_KEY=$(echo $temp_role | jq -r .Credentials.SecretAccessKey)
+      - export AWS_SESSION_TOKEN=$(echo $temp_role | jq -r .Credentials.SessionToken)
+      - aws sts get-caller-identity
+      - sleep 120 #wait for the SCP detach to propagate and complete
+      - aws cloudformation delete-stack --stack-name RoleForSCPIntegrationTestsStage-ScpIntegrationTestsRoleStack
+      - aws cloudformation wait stack-delete-complete --stack-name RoleForSCPIntegrationTestsStage-ScpIntegrationTestsRoleStack
+reports:
+  pytest_reports:
+    files:
+      - test-report.xml
+    base-directory: ./service-control-policies/scp/scp/integration_tests/tests/test-reports
+    file-format: JUNITXML

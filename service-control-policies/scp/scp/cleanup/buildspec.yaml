@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      - pwd
+      - echo ${CODEBUILD_SRC_DIR}
+      - echo ${TESTS_DIR}
+      - pip install --upgrade pip
+      - pip install -r requirements.txt
+      - aws --version
+      - aws sts get-caller-identity
+      - aws cloudformation delete-stack --stack-name RoleForSCPIntegrationTestsStage-ScpIntegrationTestsRoleStack
